@@ -17,6 +17,7 @@ type kafkaRepository struct {
 }
 
 func NewKafkaRepository(brokerAdress, topic string) *kafkaRepository {
+	// producer
 	w := &kafka.Writer{
 		Addr:                   kafka.TCP(brokerAdress),
 		Topic:                  topic,

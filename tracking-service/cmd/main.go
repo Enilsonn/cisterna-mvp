@@ -1,4 +1,4 @@
-package trackingservice
+package main
 
 import (
 	"cisterna-mvp/tracking-service/handler"
@@ -19,7 +19,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Post("api/v1/gps", gps_handler.ReciveGPS)
+	r.Post("/api/v1/gps", gps_handler.ReciveGPS)
 
 	srv := &http.Server{
 		Addr:         ":8080",
