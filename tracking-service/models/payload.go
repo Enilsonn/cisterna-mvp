@@ -7,9 +7,3 @@ type GPSPayload struct {
 	Longitude float64 `json:"longitude"`
 	Timestamp string  `json:"timestamp"`
 }
-
-// O que usamos para ler a resposta de ip-api.com
-type IPLocation struct {
-	Lon float64 `json:"lon"`
-	Lat float64 `json:"lat"`
-}
