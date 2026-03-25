@@ -48,15 +48,47 @@ func (r *postgresRepo) createTruckCoordinates(ctx context.Context) error {
 }
 
 func (r *postgresRepo) SavePosition(ctx context.Context, pos domain.TruckPosition) error {
-	query := `
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("error to inicialize transation: %v", err)
+	}
+	defer tx.Rollback()
+
+	// -- INSERT
+	queryHistory := `
 		INSERT INTO truck_coordinates (truck_id, location, recorded_at)
 		VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4)
 	`
-	_, err := r.db.ExecContext(ctx, query,
+	_, err = tx.ExecContext(ctx, queryHistory,
 		pos.TruckID,
 		pos.Longitude, // vem primeiro
 		pos.Latitude,
 		pos.Timestamp)
+	if err != nil {
+		return fmt.Errorf("error to INSERT on history: %v", err)
+	}
 
-	return err
+	// -- UPSERT
+	queryCurrentStatus := `
+		INSERT INTO truck_current_status (truck_id, location, last_seen)
+		VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4)
+		ON CONFLICT (truck_id) 
+		DO UPDATE SET 
+			location = EXCLUDED.location,
+			last_seen = EXCLUDED.last_seen;
+	`
+	_, err = tx.ExecContext(ctx, queryCurrentStatus,
+		pos.TruckID,
+		pos.Longitude,
+		pos.Latitude,
+		pos.Timestamp)
+	if err != nil {
+		return fmt.Errorf("error to UPSERT on current status: %v", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("error to commit trasation: %v", err)
+	}
+
+	return nil
 }
