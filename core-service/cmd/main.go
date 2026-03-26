@@ -46,6 +46,8 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/cisterns", mapHandler.HandlerGetCisters)
+		r.Put("/cisterns", mapHandler.HandlerCreateCistern)
+
 		r.Get("/trucks/{truck_id}/location", mapHandler.HandlerGetTruckCurrentStatus)
 	})
 	s := http.Server{

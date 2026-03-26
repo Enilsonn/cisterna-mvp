@@ -14,6 +14,7 @@ import (
 var schemaSQL string
 
 type PositionRepository interface {
+	CreateCistern(ctx context.Context, cis domain.Cisterna) (int64, error)
 	SavePosition(ctx context.Context, pos domain.TruckPosition) error
 	GetCisterns(ctx context.Context) ([]domain.Cisterna, error)
 	GetTruckCurrrentLocation(ctx context.Context, id string) (*domain.TruckStatus, error)
@@ -145,4 +146,32 @@ func (r *postgresRepo) GetTruckCurrrentLocation(ctx context.Context, id string) 
 	}
 
 	return &t, nil
+}
+
+func (r *postgresRepo) CreateCistern(ctx context.Context, cis domain.Cisterna) (int64, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return 0, fmt.Errorf("error to initialize transation: %v", err)
+	}
+	defer tx.Rollback()
+
+	var id int64
+	query := `
+		INSERT INTO cisterns (name, capacity_liters, location)
+		VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326))
+		RETURNING id
+	`
+	if err = tx.QueryRowContext(ctx, query,
+		cis.Nome,
+		cis.CapacityLiters,
+		cis.Longitude,
+		cis.Latitude).Scan(&id); err != nil {
+		return 0, fmt.Errorf("error to save cistern: %v", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, fmt.Errorf("error to commit: %v", err)
+	}
+
+	return id, nil
 }
