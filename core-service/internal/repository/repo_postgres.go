@@ -15,6 +15,8 @@ var schemaSQL string
 
 type PositionRepository interface {
 	SavePosition(ctx context.Context, pos domain.TruckPosition) error
+	GetCisterns(ctx context.Context) ([]domain.Cisterna, error)
+	GetTruckCurrrentLocation(ctx context.Context, id string) (*domain.TruckStatus, error)
 }
 
 type postgresRepo struct {
@@ -91,4 +93,56 @@ func (r *postgresRepo) SavePosition(ctx context.Context, pos domain.TruckPositio
 	}
 
 	return nil
+}
+
+func (r *postgresRepo) GetCisterns(ctx context.Context) ([]domain.Cisterna, error) {
+	query := `
+			SELECT id, nome, capacity_liters, ST_Y(location) as lat, ST_X(location) as lon
+			FROM cisterns`
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error to get cisterns: %v", err)
+	}
+	defer rows.Close()
+
+	var cisterns []domain.Cisterna
+	for rows.Next() {
+		var c domain.Cisterna
+		if err := rows.Scan(
+			&c.ID,
+			&c.Nome,
+			&c.CapacityLiters,
+			&c.Latitude,
+			&c.Longitude,
+		); err != nil {
+			return nil, fmt.Errorf("error to scan cistern")
+		}
+		cisterns = append(cisterns, c)
+	}
+
+	return cisterns, nil
+}
+
+func (r *postgresRepo) GetTruckCurrrentLocation(ctx context.Context, id string) (*domain.TruckStatus, error) {
+	query := `
+			SELECT truck_id, ST_Y(location) as lat, ST_X(location) as lon, last_seen
+			FROM truck_current_status
+			WHERE truck_id = $1
+			`
+	var t domain.TruckStatus
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&t.TruckID,
+		&t.Latitude,
+		&t.Longitude,
+		&t.LastSeen,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("truck not found: %v", err)
+		} else {
+			return nil, fmt.Errorf("error to search truck: %v", err)
+		}
+	}
+
+	return &t, nil
 }
