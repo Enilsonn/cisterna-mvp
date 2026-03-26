@@ -23,4 +23,4 @@ A entrega só muda para o status `ENTREGUE` se o banco de dados espacial registr
 - **Map Service (Go):** API pública de alta performance lendo posições em tempo real do Redis.
 - **Auth Service (Go):** Segurança e validação de JWT (Motorista, Titular da Cisterna, Admin).
 - **Reporting Service (Go):** Recebe e classifica as denúncias para o painel de auditoria.
-- **Infraestrutura:** PostgreSQL + PostGIS (Histórico oficial), Apache Kafka (Mensageria), Redis (Cache de tempo real) rodando via Docker.
+- **Infraestrutura:** PostgreSQL + PostGIS (Histórico oficial) e Apache Kafka (Mensageria) rodando via Docker.
