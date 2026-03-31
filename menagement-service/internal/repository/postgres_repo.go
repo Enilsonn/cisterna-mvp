@@ -521,7 +521,7 @@ func (r *postgresRepo) GetDeliveryByPipeiroUUID(ctx context.Context, uuid string
 	var deliveries []*domain.Delivery
 	for rows.Next() {
 		var d domain.Delivery
-		if rows.Scan(
+		if err := rows.Scan(
 			&d.ID,
 			&d.CisternID,
 			&d.TruckID,
@@ -560,7 +560,7 @@ func (r *postgresRepo) GetDeliveryByTruckUUID(ctx context.Context, uuid string) 
 	var deliveries []*domain.Delivery
 	for rows.Next() {
 		var d domain.Delivery
-		if rows.Scan(
+		if err := rows.Scan(
 			&d.ID,
 			&d.CisternID,
 			&d.TruckID,
