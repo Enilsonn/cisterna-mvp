@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cisterna-mvp/menagement-service/client"
 	"cisterna-mvp/menagement-service/internal/domain"
 	"cisterna-mvp/menagement-service/internal/repository"
 	"cisterna-mvp/menagement-service/internal/utils"
@@ -12,12 +13,14 @@ import (
 )
 
 type apiHandler struct {
-	repo repository.SighRepository
+	repo       repository.SighRepository
+	coreClient client.CoreClient
 }
 
-func NewApiHandler(repo repository.SighRepository) *apiHandler {
+func NewApiHandler(repo repository.SighRepository, coreClient client.CoreClient) *apiHandler {
 	return &apiHandler{
-		repo: repo,
+		repo:       repo,
+		coreClient: coreClient,
 	}
 }
 
@@ -35,6 +38,10 @@ func (h *apiHandler) CreateCistern(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cistern.ID = id
+
+	if err := h.coreClient.SyncCistern(r.Context(), cistern); err != nil {
+		utils.RespondeWithError(w, http.StatusInternalServerError, fmt.Sprintf("error to sync cistern in core-service: %v", err))
+	}
 	utils.RespondeWithJSON(w, http.StatusCreated, cistern)
 }
 

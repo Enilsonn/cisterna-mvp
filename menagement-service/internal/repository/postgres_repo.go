@@ -11,6 +11,9 @@ import (
 	_ "embed"
 )
 
+//go:embed schema.sql
+var schemaSQL string
+
 type SighRepository interface {
 	CreatePipeiro(ctx context.Context, pipeiro domain.Pipeiro) (string, error)
 	CreateTruck(ctx context.Context, truck domain.Truck) (string, error)
@@ -37,10 +40,33 @@ type postgresRepo struct {
 	repo *sql.DB
 }
 
-func NewPostgresRepo(db *sql.DB) SighRepository {
-	return &postgresRepo{
+func (r *postgresRepo) createSchema(ctx context.Context) error {
+	if _, err := r.repo.Exec(schemaSQL); err != nil {
+		return fmt.Errorf("error to exec schemaSQL: %v", err)
+	}
+
+	return nil
+}
+
+func NewPostgresRepo(connString string) (SighRepository, error) {
+	db, err := sql.Open("postgres", connString)
+	if err != nil {
+		return nil, fmt.Errorf("error to connect data base: %v", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("error to pint data base: %v", err)
+	}
+
+	repo := &postgresRepo{
 		repo: db,
 	}
+
+	if err = repo.createSchema(context.Background()); err != nil {
+		return nil, fmt.Errorf("error to exec schemaSQL: %v", err)
+	}
+
+	return repo, nil
 }
 
 func (r *postgresRepo) CreatePipeiro(ctx context.Context, pipeiro domain.Pipeiro) (string, error) {
