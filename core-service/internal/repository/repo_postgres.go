@@ -51,7 +51,7 @@ func (r *postgresRepo) createTruckCoordinates(ctx context.Context) error {
 }
 
 func (r *postgresRepo) SavePosition(ctx context.Context, pos domain.TruckPosition) error {
-	tx, err := r.db.BeginTx(ctx, nil)
+	tx, err := r.db.BeginTx(ctx, nil) 
 	if err != nil {
 		return fmt.Errorf("error to inicialize transation: %v", err)
 	}
