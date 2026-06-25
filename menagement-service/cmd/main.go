@@ -34,6 +34,11 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	// repo, err := repository.NewInMemorySighRepo()
+	// if err != nil {
+	// 		log.Fatal(err)
+	//}
+
 	coreClient := client.NewCoreClient(coreURL)
 
 	handler := api.NewApiHandler(repo, coreClient)
