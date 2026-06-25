@@ -23,6 +23,11 @@ func main() {
 		log.Fatalf("erro fatal ao iniciar a infraestrutura de dados: %v\n", err)
 	}
 
+	// repo, err := repository.NewInMemoryRepo()
+	// if err != nil {
+	// 		log.Fatal(err)
+	//}
+
 	// -- Kafka configs
 	kafkaBrokers := []string{"localhost:9092"}
 	kafkaTopic := "truck_coordinates"
