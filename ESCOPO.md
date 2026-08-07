@@ -24,3 +24,14 @@ A entrega só muda para o status `ENTREGUE` se o banco de dados espacial registr
 - **Auth Service (Go):** Segurança e validação de JWT (Motorista, Titular da Cisterna, Admin).
 - **Reporting Service (Go):** Recebe e classifica as denúncias para o painel de auditoria.
 - **Infraestrutura:** PostgreSQL + PostGIS (Histórico oficial) e Apache Kafka (Mensageria) rodando via Docker.
+
+## 🧩 Padrões de Projeto Identificados
+
+| Padrão | Onde aparece | Por quê |
+|---|---|---|
+| Factory Method / Simple Factory | auth_service.go, handlers.go, gps.go, handlers.go, core_client.go | Há vários `New...` que criam objetos já prontos: `NewAuthService`, `NewHandler`, `NewGPSHandler`, `NewMapHandler`, `NewCoreClient`, `NewKafkaConsumer`, etc. |
+| Adapter / Port-Adapter | core_client.go | O serviço de gestão usa uma interface `CoreClient` e uma implementação `coreClientImpl` para se adaptar ao acesso HTTP ao core-service. Também há esse estilo nas interfaces de repositório e nas implementações concretas. |
+| Decorator | main.go, main.go, main.go, main.go | O middleware do Chi (Logger, Recoverer, RealIP) envolve o handler e acrescenta comportamento sem mudar o fluxo principal. Isso é muito próximo do Decorator. |
+| Proxy | main.go, main.go | A função `requireRole` intercepta a requisição, valida o token e só então encaminha para o handler real. É um proxy/guard de acesso. |
+| Chain of Responsibility | main.go, main.go, main.go | A cadeia de middlewares processa a requisição em sequência; cada camada pode parar a execução ou passar adiante. |
+| Observer / Publisher-Subscriber | kafka_publisher.go, kafka_consumer.go, service.go | O auth-service publica eventos; o core-service e o logs-service consomem esses eventos de forma assíncrona. É um padrão de publicação/assinatura bem próximo do Observer. |
