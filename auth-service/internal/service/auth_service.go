@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"cisterna-mvp/auth-service/internal/domain"
+	"cisterna-mvp/auth-service/internal/messaging"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -52,15 +53,21 @@ func (s *AuthService) RegisterUser(ctx context.Context, email, password string, 
 		return domain.User{}, err
 	}
 
+	if s.publisher != nil {
+		_ = s.publisher.Publish(ctx, messaging.NewAuthEvent("user_registered", user.Email, string(user.Role), user.ID))
+	}
+
 	return user, nil
 }
 
 type AuthService struct {
-	repo Repository
+	repo      Repository
+	publisher *messaging.Publisher
 }
 
 func NewAuthService(repo Repository) *AuthService {
-	return &AuthService{repo: repo}
+	publisher := messaging.NewPublisher([]string{"localhost:9092"}, "auth-events")
+	return &AuthService{repo: repo, publisher: publisher}
 }
 
 func (s *AuthService) Login(ctx context.Context, email, password string) (domain.TokenPair, error) {
@@ -85,6 +92,10 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (domain
 		return domain.TokenPair{}, err
 	}
 
+	if s.publisher != nil {
+		_ = s.publisher.Publish(ctx, messaging.NewAuthEvent("user_logged_in", user.Email, string(user.Role), user.ID))
+	}
+
 	return domain.TokenPair{
 		AccessToken:   accessToken,
 		RefreshToken:  refreshToken,
@@ -94,6 +105,13 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (domain
 }
 
 func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
+	stored, err := s.repo.GetRefreshToken(ctx, refreshToken)
+	if err == nil && s.publisher != nil {
+		user, errUser := s.repo.GetUserByID(ctx, stored.UserID)
+		if errUser == nil {
+			_ = s.publisher.Publish(ctx, messaging.NewAuthEvent("user_logged_out", user.Email, string(user.Role), user.ID))
+		}
+	}
 	return s.repo.RevokeRefreshToken(ctx, refreshToken)
 }
 
@@ -119,6 +137,10 @@ func (s *AuthService) RefreshTokens(ctx context.Context, refreshToken string) (d
 	newRefreshToken, err := s.generateRefreshToken(user)
 	if err != nil {
 		return domain.TokenPair{}, err
+	}
+
+	if s.publisher != nil {
+		_ = s.publisher.Publish(ctx, messaging.NewAuthEvent("token_refreshed", user.Email, string(user.Role), user.ID))
 	}
 
 	return domain.TokenPair{
