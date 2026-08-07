@@ -1,0 +1,658 @@
+{
+  "info": {
+    "name": "Cisterna MVP - Coleção para teste manual",
+    "description": "Collection pronta para importar no Postman ou Insomnia com os endpoints de auth, management e tracking.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url_auth",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "base_url_management",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "base_url_tracking",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@cisterna.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_password",
+      "value": "admin123",
+      "type": "string"
+    },
+    {
+      "key": "pipeiro_email",
+      "value": "pipeiro@cisterna.com",
+      "type": "string"
+    },
+    {
+      "key": "pipeiro_password",
+      "value": "pipeiro123",
+      "type": "string"
+    },
+    {
+      "key": "cidadao_email",
+      "value": "cidadao@cisterna.com",
+      "type": "string"
+    },
+    {
+      "key": "cidadao_password",
+      "value": "cidadao123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/register",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register pipeiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{pipeiro_email}}\",\n  \"password\": \"{{pipeiro_password}}\",\n  \"role\": \"PIPEIRO\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/register",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register cidadão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{cidadao_email}}\",\n  \"password\": \"{{cidadao_password}}\",\n  \"role\": \"CIDADAO\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/register",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/login",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login pipeiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{pipeiro_email}}\",\n  \"password\": \"{{pipeiro_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/login",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login cidadão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{cidadao_email}}\",\n  \"password\": \"{{cidadao_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/login",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validate token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"access_token\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/validate",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "validate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/refresh",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_auth}}/api/v1/auth/logout",
+              "host": [
+                "{{base_url_auth}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Management",
+      "item": [
+        {
+          "name": "Create cistern",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cisterna Centro\",\n  \"ResponsabibleName\": \"Maria Souza\",\n  \"city\": \"Recife\",\n  \"capacity_liters\": 50000,\n  \"latitude\": -8.05,\n  \"longitude\": -34.88\n}"
+            },
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/cisterns/",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cisterns"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create pipeiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João da Silva\",\n  \"cpf\": \"12345678900\",\n  \"cnh\": \"98765432100\",\n  \"phone\": \"81999990000\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/pipeiros/",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pipeiros"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create truck",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"ABC1234\",\n  \"capacity_liters\": 12000,\n  \"pipeiro_id\": \"pipeiro-1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/trucks/",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cistern_id\": \"cistern-1\",\n  \"truck_id\": \"truck-1\",\n  \"status\": \"AGENDADO\",\n  \"scheduled_date\": \"2026-08-07T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/deliveries/",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "deliveries"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List cisterns",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/cisterns/",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cisterns"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get cistern by UUID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/cisterns/123e4567-e89b-12d3-a456-426614174000",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cisterns",
+                "123e4567-e89b-12d3-a456-426614174000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get pipeiro by CPF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/pipeiros/12345678900",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pipeiros",
+                "12345678900"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get truck by plate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/trucks/ABC1234",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks",
+                "ABC1234"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get trucks by pipeiro UUID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/pipeiros/pipeiro-1/trucks",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pipeiros",
+                "pipeiro-1",
+                "trucks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get deliveries by pipeiro UUID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/pipeiros/pipeiro-1/deliveries",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pipeiros",
+                "pipeiro-1",
+                "deliveries"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get deliveries by truck UUID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_management}}/api/v1/trucks/truck-1/deliveries",
+              "host": [
+                "{{base_url_management}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks",
+                "truck-1",
+                "deliveries"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tracking",
+      "item": [
+        {
+          "name": "Send GPS coordinates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\n  \"truck_id\": \"truck-1\",\n  \"latitude\": -7.120000,\n  \"longitude\": -34.880000,\n  \"timestamp\": \"2026-08-07T10:00:00Z\"\n}]"
+            },
+            "url": {
+              "raw": "{{base_url_tracking}}/api/v1/gps",
+              "host": [
+                "{{base_url_tracking}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "gps"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
