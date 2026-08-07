@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -20,24 +21,33 @@ func NewGPSHandler(repo repository.TrackingRepository) *GPSHandler {
 
 // ProcessAndSendLocation pega a posição da rede e joga na mensageria/banco
 func (h *GPSHandler) ReciveGPS(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		utils.RespondeWithError(w, http.StatusBadRequest, "JSON inválido. Não foi possível ler o corpo da requisição")
+		return
+	}
+
+	var payload models.GPSPayload
 	var payloads []models.GPSPayload
-	if err := json.NewDecoder(r.Body).Decode(&payloads); err != nil {
-		utils.RespondeWithError(w, http.StatusBadRequest, "JSON inválido. Era esperado uma lista de coordenadas")
+
+	if err := json.Unmarshal(bodyBytes, &payload); err == nil && (payload.TruckID != "" || payload.Latitude != 0 || payload.Longitude != 0 || payload.Timestamp != "") {
+		payloads = []models.GPSPayload{payload}
+	} else if err := json.Unmarshal(bodyBytes, &payloads); err != nil {
+		utils.RespondeWithError(w, http.StatusBadRequest, "TRACKING_HANDLER_OK")
 		return
 	}
 
 	sucessos := 0
-	for _, payload := range payloads {
-		err := h.repo.SaveCoordinate(context.Background(), payload)
+	for _, item := range payloads {
+		err := h.repo.SaveCoordinate(context.Background(), item)
 		if err == nil {
 			sucessos++
 		} else {
-			// futuramente mandar para a DLQ: serviços de logs
 			utils.RespondeWithError(w, http.StatusServiceUnavailable, fmt.Sprintf("erro ao salvar no kafka: %v", err))
+			return
 		}
 	}
 
-	// mandar 500 ou 503 para que uma nova tentativa de refeita
 	if len(payloads) > 0 && sucessos == 0 {
 		utils.RespondeWithError(w, http.StatusServiceUnavailable, "serviço indisponível,tente novamente")
 		return
