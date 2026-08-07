@@ -4,14 +4,70 @@ import (
 	"cisterna-mvp/menagement-service/client"
 	"cisterna-mvp/menagement-service/internal/api"
 	"cisterna-mvp/menagement-service/internal/repository"
+	"context"
+	"encoding/base64"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
+
+type accessClaims struct {
+	UserID string `json:"user_id"`
+	Role   string `json:"role"`
+}
+
+func requireRole(requiredRole string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authorization := r.Header.Get("Authorization")
+			if !strings.HasPrefix(authorization, "Bearer ") {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			token := strings.TrimPrefix(authorization, "Bearer ")
+			token = strings.TrimSpace(token)
+			claims, err := parseClaims(token)
+			if err != nil {
+				http.Error(w, "invalid token", http.StatusUnauthorized)
+				return
+			}
+
+			if claims.Role != requiredRole {
+				http.Error(w, "forbidden", http.StatusForbidden)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), "auth_claims", claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func parseClaims(token string) (accessClaims, error) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return accessClaims{}, http.ErrNoLocation
+	}
+
+	payload, err := base64.RawStdEncoding.DecodeString(parts[1])
+	if err != nil {
+		return accessClaims{}, err
+	}
+
+	var claims accessClaims
+	if err := json.Unmarshal(payload, &claims); err != nil {
+		return accessClaims{}, err
+	}
+
+	return claims, nil
+}
 
 func main() {
 	dbURL := os.Getenv("DATABASE_URL")
@@ -48,6 +104,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP) // fundamental
+	r.Use(requireRole("ADMIN"))
 
 	r.Route("/api/v1", func(r chi.Router) {
 
