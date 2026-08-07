@@ -14,6 +14,8 @@ import (
 )
 
 func main() {
+	loadEnv()
+
 	repo := repository.NewInMemoryRepository()
 	authService := service.NewAuthService(repo)
 	handler := api.NewHandler(authService)
@@ -32,8 +34,9 @@ func main() {
 
 	seedUsers(repo)
 
-	log.Println("auth-service listening on :8082")
-	if err := http.ListenAndServe(":8082", r); err != nil {
+	port := getAddr("AUTH_PORT", "8082")
+	log.Printf("auth-service listening on %s", port)
+	if err := http.ListenAndServe(port, r); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
 }

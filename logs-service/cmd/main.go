@@ -10,9 +10,17 @@ import (
 )
 
 func main() {
-	brokers := []string{"localhost:9092"}
-	topic := "truck_coordinates"
-	groupID := "logs-service-group"
+	loadEnv()
+
+	brokers := []string{os.Getenv("KAFKA_BROKERS")}
+	topic := os.Getenv("KAFKA_TOPIC")
+	if topic == "" {
+		topic = "truck_coordinates"
+	}
+	groupID := os.Getenv("LOGS_GROUP_ID")
+	if groupID == "" {
+		groupID = "logs-service-group"
+	}
 
 	service := consumer.NewService(brokers, topic, groupID)
 	ctx, cancel := context.WithCancel(context.Background())

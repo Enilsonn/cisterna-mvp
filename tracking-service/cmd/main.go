@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -68,7 +69,18 @@ func parseClaims(token string) (accessClaims, error) {
 }
 
 func main() {
-	kafkaRepository := repository.NewKafkaRepository("localhost:9092", "truck_coordinates")
+	loadEnv()
+
+	broker := os.Getenv("TRACKING_KAFKA_BROKERS")
+	if broker == "" {
+		broker = "localhost:9092"
+	}
+	topic := os.Getenv("TRACKING_KAFKA_TOPIC")
+	if topic == "" {
+		topic = "truck_coordinates"
+	}
+
+	kafkaRepository := repository.NewKafkaRepository(broker, topic)
 	gps_handler := handler.NewGPSHandler(kafkaRepository)
 
 	r := chi.NewRouter()
@@ -78,8 +90,13 @@ func main() {
 
 	r.Post("/api/v1/gps", gps_handler.ReciveGPS)
 
+	port := os.Getenv("TRACKING_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	srv := &http.Server{
-		Addr:         ":8080",
+		Addr:         ":" + port,
 		Handler:      r,
 		ReadTimeout:  10 * time.Second,  // tempo maximo para o aparelho enviar o dado
 		WriteTimeout: 30 * time.Second,  // tempo máximo para o serviço responder responder 202

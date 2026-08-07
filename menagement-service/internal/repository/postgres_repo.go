@@ -41,6 +41,15 @@ type postgresRepo struct {
 }
 
 func (r *postgresRepo) createSchema(ctx context.Context) error {
+	if _, err := r.repo.Exec(`
+		DROP TABLE IF EXISTS deliveries;
+		DROP TABLE IF EXISTS trucks;
+		DROP TABLE IF EXISTS cisterns;
+		DROP TABLE IF EXISTS pipeiros;
+	`); err != nil {
+		return fmt.Errorf("error to reset schema: %v", err)
+	}
+
 	if _, err := r.repo.Exec(schemaSQL); err != nil {
 		return fmt.Errorf("error to exec schemaSQL: %v", err)
 	}
@@ -381,7 +390,7 @@ func (r *postgresRepo) GetTruckByPlate(ctx context.Context, plate string) (*doma
 	query := `
 		SELECT id, plate, capacity_liters, pipeiro_id, created_at 
 		FROM trucks 
-		WHERE license_plate = $1
+		WHERE plate = $1
 	`
 
 	var truck domain.Truck
@@ -412,6 +421,7 @@ func (r *postgresRepo) GetCisternByUUID(ctx context.Context, uuid string) (*doma
 	if err := r.repo.QueryRowContext(ctx, query, uuid).Scan(
 		&cistern.ID,
 		&cistern.Name,
+		&cistern.ResponsabibleName,
 		&cistern.City,
 		&cistern.CapacityLiters,
 		&cistern.Latitude,

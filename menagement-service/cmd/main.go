@@ -70,6 +70,8 @@ func parseClaims(token string) (accessClaims, error) {
 }
 
 func main() {
+	loadEnv()
+
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://admin:admin@localhost:5432/management_db?sslmode=disable"
@@ -82,7 +84,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8081"
 	}
 
 	repo, err := repository.NewPostgresRepo(dbURL)

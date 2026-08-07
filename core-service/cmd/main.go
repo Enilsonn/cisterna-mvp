@@ -16,8 +16,13 @@ import (
 )
 
 func main() {
+	loadEnv()
+
 	// -- DB contigs
-	pgConnStr := "postgres://admin:adminpassword@localhost:5432/pipeiros_db?sslmode=disable"
+	pgConnStr := os.Getenv("CORE_DB_URL")
+	if pgConnStr == "" {
+		pgConnStr = "postgres://admin:adminpassword@localhost:5432/pipeiros_db?sslmode=disable"
+	}
 	repo, err := repository.NewPostgresRepo(pgConnStr)
 	if err != nil {
 		log.Fatalf("erro fatal ao iniciar a infraestrutura de dados: %v\n", err)
@@ -29,9 +34,15 @@ func main() {
 	//}
 
 	// -- Kafka configs
-	kafkaBrokers := []string{"localhost:9092"}
-	kafkaTopic := "truck_coordinates"
-	kafkaGroupID := "core-service-group"
+	kafkaBrokers := []string{os.Getenv("CORE_KAFKA_BROKERS")}
+	kafkaTopic := os.Getenv("CORE_KAFKA_TOPIC")
+	if kafkaTopic == "" {
+		kafkaTopic = "truck_coordinates"
+	}
+	kafkaGroupID := os.Getenv("CORE_KAFKA_GROUP_ID")
+	if kafkaGroupID == "" {
+		kafkaGroupID = "core-service-group"
+	}
 	consumer := messaging.NewKafkaConsumer(
 		kafkaBrokers,
 		kafkaTopic,
@@ -55,8 +66,13 @@ func main() {
 
 		r.Get("/trucks/{truck_id}/location", mapHandler.HandlerGetTruckCurrentStatus)
 	})
+	port := os.Getenv("CORE_PORT")
+	if port == "" {
+		port = "8081"
+	}
+
 	s := http.Server{
-		Addr:              ":8081",
+		Addr:              ":" + port,
 		Handler:           r,
 		ReadTimeout:       0,
 		ReadHeaderTimeout: 0,
